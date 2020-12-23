@@ -4,7 +4,7 @@ class NewduSpider(scrapy.Spider):
     name = 'newdu'
     allowed_domains = ['newdu.com']
     start_urls = ['http://ab.newdu.com/book/']
-    newdu_url = 'http://ab.newdu.com/book/'
+    newdu_url = 'http://ab.newdu.com/book'
 
     def parse(self, response):
         # 获取分类名
@@ -12,9 +12,9 @@ class NewduSpider(scrapy.Spider):
         cate_url_list = response.xpath('//*[@id="book_right"]/div[1]/div[2]/div[*]/dl/dt/a/@href').extract()
         print(cate_nam_list)
         print(cate_url_list)
-        # for samll_cate_url in cate_url_list:
-        #     print(samll_cate_url)
-        #     yield scrapy.Request(self.newdu+newdu_url,callback=self.parse_next)
+        for samll_cate_url in cate_url_list:
+            print(self.newdu_url+samll_cate_url)
+            yield scrapy.Request(self.newdu_url+samll_cate_url,callback=self.parse_next)
         pass
 
     def parse_next(self,response):
