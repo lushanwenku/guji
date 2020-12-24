@@ -21,13 +21,39 @@ https://www.cnblogs.com/bluesky-ivy/p/6203603.html
 
 
 
+=========
+wp_terms 分类：经部（1000） 易类（1001）
+wp_term_taxonomy： 分类-父子关系
+wp_term_relationships： 文章-分类关系
+wp_posts：文章表
+
+INSERT INTO `wp_esd`.`wp_posts`(`ID`, `post_author`, `post_date`, `post_date_gmt`, `post_content`, `post_title`, `post_excerpt`, `post_status`, `comment_status`, `ping_status`, `post_password`, `post_name`, `to_ping`, `pinged`, `post_modified`, `post_modified_gmt`, `post_content_filtered`, `post_parent`, `guid`, `menu_order`, `post_type`, `post_mime_type`, `comment_count`) VALUES (45, 1, '2020-12-25 01:04:46', '2020-12-24 17:04:46', '文章2-正文', '文章2-标题', '', 'publish', 'open', 'open', '', '文章2-标题', '', '', '2020-12-25 01:04:46', '2020-12-24 17:04:46', '', 0, 'http://www.esd.com/?p=45', 0, 'post', '', 0);
 
 
 
-
-
-
-
+ID
+post_author
+post_date
+post_date_gmt
+post_content
+post_title
+post_excerpt
+post_status
+comment_status
+ping_status
+post_password
+post_name
+to_ping
+pinged
+post_modified
+post_modified_gmt
+post_content_filtered
+post_parent
+guid
+menu_order
+post_type
+post_mime_type
+comment_count
 
 
 

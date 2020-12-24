@@ -7,7 +7,13 @@
 # useful for handling different item types with a single interface
 from itemadapter import ItemAdapter
 
+from guji.utils.mysql import MySQL
+
 
 class GujiPipeline:
+    def __init__(self):
+        self.mysql = MySQL()
+
     def process_item(self, item, spider):
+        self.mysql.insert('wp_posts',item)
         return item
