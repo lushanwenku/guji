@@ -2,6 +2,7 @@
 #
 # See documentation in:
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
+import random
 
 from scrapy import signals
 
@@ -101,3 +102,19 @@ class GujiDownloaderMiddleware:
 
     def spider_opened(self, spider):
         spider.logger.info('Spider opened: %s' % spider.name)
+
+
+class ProxyMiddleware(object):
+    ip_pools=[
+        {'ip': '124.65.238.166:80'},
+        # {'ip':''},
+    ]
+    # overwrite process request
+    def process_request(self, request, spider):
+        # Set the location of the proxy
+        #request.meta['proxy'] = "http://YOUR_PROXY_IP:PORT"
+        ip=random.choice(self.ip_pools) #随机选择一个ip
+        request.meta["proxy"]="http://"+ip['ip']
+
+
+

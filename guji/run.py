@@ -8,5 +8,5 @@ if __name__ == '__main__':
 
     # 通过方法 get_project_settings() 获取配置信息
     process = CrawlerProcess(get_project_settings())
-    process.crawl(Jingbu)
+    process.crawl(NewduSpider)
     process.start()
