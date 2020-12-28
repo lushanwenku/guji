@@ -36,6 +36,49 @@ INSERT INTO `wp_esd`.`wp_posts`(`ID`, `post_author`, `post_date`, `post_date_gmt
        sql = "INSERT INTO wp_posts(ID, post_author, post_date, post_date_gmt, post_content, post_title, post_excerpt, post_status, comment_status, ping_status, post_password, post_name, to_ping, pinged, post_modified, post_modified_gmt, post_content_filtered, post_parent, guid, menu_order, post_type, post_mime_type, comment_count) " \
               "VALUES ({post_author}, '{post_date}', '{post_date_gmt}', '{post_content}', '{post_title}', '{post_excerpt}', '{post_status}', '{comment_status}', '{ping_status}', '{post_password}', '{post_name}', '{to_ping}', '{pinged}', '{post_modified}', '{post_modified_gmt}', '{post_content_filtered}', '{post_parent}', {guid}, '{menu_order}', {post_type}, '{post_mime_type}', {comment_count})".format()
 
+----一级 分类----------------------------------
+id = 27
+INSERT INTO `wp_esd`.`wp_terms`(`term_id`, `name`, `slug`, `term_group`) VALUES (27, 'yywFL', 'yywflbm', 0);
+
+INSERT INTO `wp_esd`.`wp_termmeta`(`meta_id`, `term_id`, `meta_key`, `meta_value`) VALUES (37, 27, 'is_filter', '');
+INSERT INTO `wp_esd`.`wp_termmeta`(`meta_id`, `term_id`, `meta_key`, `meta_value`) VALUES (38, 27, 'seo-title', 'yywFL SEO TITLE');
+INSERT INTO `wp_esd`.`wp_termmeta`(`meta_id`, `term_id`, `meta_key`, `meta_value`) VALUES (39, 27, 'seo-keywords', 'yywFL SEO KEYWORD');
+INSERT INTO `wp_esd`.`wp_termmeta`(`meta_id`, `term_id`, `meta_key`, `meta_value`) VALUES (40, 27, 'seo-description', 'yywFL SEO DESC');
+
+INSERT INTO `wp_esd`.`wp_term_taxonomy`(`term_taxonomy_id`, `term_id`, `taxonomy`, `description`, `parent`, `count`) VALUES (9, 27, 'category', 'yywFLD IMAGE DESC', 0, 0);
+
+--------------------------------------
+
+-----二级 分类-----------------------
+-- id 29
+INSERT INTO `wp_esd`.`wp_terms`(`term_id`, `name`, `slug`, `term_group`) VALUES (29, 'yywFL2', 'yywfl2bm', 0);
+
+INSERT INTO `wp_esd`.`wp_termmeta`(`meta_id`, `term_id`, `meta_key`, `meta_value`) VALUES (46, 29, 'the_style', 'list');
+INSERT INTO `wp_esd`.`wp_termmeta`(`meta_id`, `term_id`, `meta_key`, `meta_value`) VALUES (47, 29, 'is_filter', '');
+INSERT INTO `wp_esd`.`wp_termmeta`(`meta_id`, `term_id`, `meta_key`, `meta_value`) VALUES (48, 29, 'seo-title', 'yywFL2 seo title ');
+INSERT INTO `wp_esd`.`wp_termmeta`(`meta_id`, `term_id`, `meta_key`, `meta_value`) VALUES (49, 29, 'seo-keywords', 'yywFL2 key word');
+INSERT INTO `wp_esd`.`wp_termmeta`(`meta_id`, `term_id`, `meta_key`, `meta_value`) VALUES (50, 29, 'seo-description', 'yywFL2 key des');
+
+INSERT INTO `wp_esd`.`wp_term_taxonomy`(`term_taxonomy_id`, `term_id`, `taxonomy`, `description`, `parent`, `count`) VALUES (11, 29, 'category', 'yywFL2 imag desc', 27, 0);
+
+-----------------------------
+----------一级菜单------------------------------
+-- id 48
+INSERT INTO `wp_esd`.`wp_posts`(`ID`, `post_author`, `post_date`, `post_date_gmt`, `post_content`, `post_title`, `post_excerpt`, `post_status`, `comment_status`, `ping_status`, `post_password`, `post_name`, `to_ping`, `pinged`, `post_modified`, `post_modified_gmt`, `post_content_filtered`, `post_parent`, `guid`, `menu_order`, `post_type`, `post_mime_type`, `comment_count`) VALUES (48, 1, '2020-12-28 22:56:53', '2020-12-28 14:56:53', 'yywFLD IMAGE DESC', '', '', 'publish', 'closed', 'closed', '', '48', '', '', '2020-12-28 22:56:53', '2020-12-28 14:56:53', '', 0, 'http://www.esd.com/?p=48', 3, 'nav_menu_item', '', 0);
+
+INSERT INTO `wp_esd`.`wp_term_relationships`(`object_id`, `term_taxonomy_id`, `term_order`) VALUES (48, 5, 0);
+
+INSERT INTO `wp_esd`.`wp_postmeta`(`meta_id`, `post_id`, `meta_key`, `meta_value`) VALUES (268, 48, '_menu_item_type', 'taxonomy');
+INSERT INTO `wp_esd`.`wp_postmeta`(`meta_id`, `post_id`, `meta_key`, `meta_value`) VALUES (269, 48, '_menu_item_menu_item_parent', '0');
+INSERT INTO `wp_esd`.`wp_postmeta`(`meta_id`, `post_id`, `meta_key`, `meta_value`) VALUES (270, 48, '_menu_item_object_id', '27');
+INSERT INTO `wp_esd`.`wp_postmeta`(`meta_id`, `post_id`, `meta_key`, `meta_value`) VALUES (271, 48, '_menu_item_object', 'category');
+INSERT INTO `wp_esd`.`wp_postmeta`(`meta_id`, `post_id`, `meta_key`, `meta_value`) VALUES (272, 48, '_menu_item_target', '');
+INSERT INTO `wp_esd`.`wp_postmeta`(`meta_id`, `post_id`, `meta_key`, `meta_value`) VALUES (273, 48, '_menu_item_classes', 'a:1:{i:0;s:0:\"\";}');
+INSERT INTO `wp_esd`.`wp_postmeta`(`meta_id`, `post_id`, `meta_key`, `meta_value`) VALUES (274, 48, '_menu_item_xfn', '');
+INSERT INTO `wp_esd`.`wp_postmeta`(`meta_id`, `post_id`, `meta_key`, `meta_value`) VALUES (275, 48, '_menu_item_url', '');
+
+
+------------------------------------------
 
 ID
 post_author

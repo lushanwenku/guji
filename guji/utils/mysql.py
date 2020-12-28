@@ -73,15 +73,18 @@ class MySQL():
     #插入数据
     def insert_sql(self,sql):
         count = 0
+        insert_id = 0
         try:
             count = self.cursor.execute(sql)
+            insert_id = self.cursor.lastrowid
             self.db.commit()
             #self.close()
         except pymysql.MySQLError as e:
             print("操作失败！")
             print(e.args)
             self.db.rollback()
-        return count
+        #return count
+        return insert_id
 
     #修改数据
     def edit(self,sql):

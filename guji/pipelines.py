@@ -40,10 +40,22 @@ class GujiPipeline:
             wp_terms_data = {'name':wp_terms_name,'slug':self.hp(wp_terms_name),'term_group':0}
             term_id = self.mysql.insert('wp_terms',wp_terms_data)
 
-            # 一级和二级 添加关联
+            # 一级和二级 分类 添加关联
             # wp_term_taxonomy( term_id, taxonomy, description, parent, count) VALUES (17, 17, 'post_tag', '', 0, 1);
-            wp_term_taxonomy_data = {'term_id':term_id,'taxonomy':'category','description':'','parent':0,'count':0}
+            wp_term_taxonomy_data = {'term_id':term_id,'taxonomy':'category','description':'','parent':cate_one_id,'count':0}
             self.mysql.insert('wp_term_taxonomy',wp_term_taxonomy_data)
+
+            #二级 导航菜单
+            nav_menu_item_two_data = {'post_author':6,'post_parent':cate_one_id}
+            nav_menu_item_two_sql = "INSERT INTO wp_posts ( post_author, post_date, post_date_gmt, post_content, post_title, post_excerpt, post_status, comment_status, ping_status, post_password, post_name, to_ping, pinged, post_modified, post_modified_gmt, post_content_filtered, post_parent, guid, menu_order, post_type, post_mime_type, comment_count )VALUES({post_author},'2020-12-29 00:00:00','2020-12-29 00:00:00','','','','publish','closed','closed','','','','','2020-12-29 00:00:00','2020-12-29 00:00:00','',{post_parent},'',0,'nav_menu_item','',0)".format(**nav_menu_item_two_data)
+            nav_menu_item_id = self.mysql.insert_sql(nav_menu_item_two_sql)
+
+            #二级 导航菜单 和 菜单分类 关联
+            wp_term_relationships_data = {'object_id':nav_menu_item_id,'term_taxonomy_id':5}
+            wp_term_relationships_sql = "INSERT INTO wp_term_relationships(object_id, term_taxonomy_id, term_order) VALUES ({object_id}, {term_taxonomy_id}, 0)".format(**wp_term_relationships_data)
+            wp_term_relationships_id = self.mysql.insert_sql(nav_menu_item_two_sql)
+            #
+
         pass
 
         cate_one_name = item['cate_one_name']
