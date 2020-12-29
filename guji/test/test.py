@@ -1,4 +1,5 @@
 import datetime
+import urllib.parse
 
 import pypinyin
 
@@ -32,6 +33,17 @@ class Test:
         cate_one_id = self.mysql.get_one(sql)[0]
         print(cate_one_id)
 
+    def get_basecode(self):
+
+        values={}
+        values['username']='威鹄网'
+        values['password']='lushanwenku.com'
+        url="http://www.baidu.com"
+        data=urllib.parse.urlencode(values)
+        print(data)
+        s='白话尚书 大战于甘，乃召六卿'
+        print(urllib.parse.quote(s))
+
 if __name__ == '__main__':
 
     # GMT_FORMAT = '%Y-%m-%d %H:%M:%S'
@@ -40,4 +52,6 @@ if __name__ == '__main__':
     #test.get_term_id()
     #print(test.hp("中国"))
 
-    test.get_one()
+    #test.get_one()
+    test.get_basecode()
+

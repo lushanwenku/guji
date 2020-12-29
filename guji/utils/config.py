@@ -16,7 +16,7 @@ MYSQL_USER = 'root'
 
 MYSQL_PASSWORD = 'root'
 
-MYSQL_DATABASE = 'wp_esd'
+MYSQL_DATABASE = 'lushanwenku'
 
 TIMEOUT = 10
 
