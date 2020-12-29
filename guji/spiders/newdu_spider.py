@@ -1,9 +1,11 @@
 import scrapy
 import datetime
+import urllib.parse
 
 from guji.gujiItem import GujiItem
 
 class NewduSpider(scrapy.Spider):
+
 
 
     # one
@@ -88,7 +90,7 @@ class NewduSpider(scrapy.Spider):
         book_chapter_url_list = response.xpath('//*[@id="chapterlist"]/dd[*]/a/@href').extract()
 
         bookItem = response.meta['bookItem']
-        bookItem['post_title'] = post_title
+        bookItem['post_title'] = urllib.parse.quote(post_title)
         bookItem['post_author_name'] = post_author_name
         bookItem['post_term'] = post_term
         bookItem['post_description'] = post_description

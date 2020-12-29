@@ -131,3 +131,7 @@ VALUES
 	0
 	);
 
+    name = 'newdu'
+    allowed_domains = ['newdu.com']
+    start_urls = ['http://ab.newdu.com/book/']
+    newdu_url = 'http://ab.newdu.com'
