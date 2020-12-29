@@ -46,7 +46,7 @@ class GujiPipeline:
             self.mysql.insert('wp_term_taxonomy',wp_term_taxonomy_data)
 
             #二级 导航菜单
-            nav_menu_item_two_data = {'post_author':6,'post_parent':cate_one_id}
+            nav_menu_item_two_data = {'post_author':8,'post_parent':cate_one_id}
             nav_menu_item_two_sql = "INSERT INTO wp_posts ( post_author, post_date, post_date_gmt, post_content, post_title, post_excerpt, post_status, comment_status, ping_status, post_password, post_name, to_ping, pinged, post_modified, post_modified_gmt, post_content_filtered, post_parent, guid, menu_order, post_type, post_mime_type, comment_count )VALUES({post_author},'2020-12-29 00:00:00','2020-12-29 00:00:00','','','','publish','closed','closed','','','','','2020-12-29 00:00:00','2020-12-29 00:00:00','',{post_parent},'',0,'nav_menu_item','',0)".format(**nav_menu_item_two_data)
             nav_menu_item_id = self.mysql.insert_sql(nav_menu_item_two_sql)
 
