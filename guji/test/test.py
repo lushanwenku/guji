@@ -44,6 +44,15 @@ class Test:
         s='白话尚书 大战于甘，乃召六卿'
         print(urllib.parse.quote(s))
 
+    def get_html(self):
+        from lxml import etree
+        import requests
+        res=requests.get('http://ab.newdu.com/book/s257777.html')
+        tree=etree.HTML(res.content)
+        div=tree.xpath('//div[@id="d1"]')[0]
+        div_str=etree.tostring(div,encoding='utf-8')
+        print (div_str)
+
 if __name__ == '__main__':
 
     # GMT_FORMAT = '%Y-%m-%d %H:%M:%S'
@@ -53,5 +62,5 @@ if __name__ == '__main__':
     #print(test.hp("中国"))
 
     #test.get_one()
-    test.get_basecode()
+    test.get_html()
 

@@ -3,6 +3,7 @@ import datetime
 import urllib.parse
 
 from guji.gujiItem import GujiItem
+from guji.utils.num_to_char_util import NumToCharUtil
 
 class NewduSpider(scrapy.Spider):
 
@@ -81,6 +82,7 @@ class NewduSpider(scrapy.Spider):
         # 目录2
         # 目录3
     def parse_next_cate_four_book_chapter_list(self,response):
+        numToCharUtil = NumToCharUtil()
         post_title = response.xpath('//*[@id="book_right"]/div/div[1]/div[1]/div[2]/div/h1/text()').extract()[0]
         post_author_name = response.xpath('//*[@id="book_right"]/div/div[1]/div[1]/div[2]/div/h2[1]/text()').extract()[0]
         post_term = response.xpath('//*[@id="book_right"]/div/div[1]/div[1]/div[2]/div/h2[2]/a/text()').extract()[0]
@@ -90,14 +92,18 @@ class NewduSpider(scrapy.Spider):
         book_chapter_url_list = response.xpath('//*[@id="chapterlist"]/dd[*]/a/@href').extract()
 
         bookItem = response.meta['bookItem']
-        bookItem['post_title'] = urllib.parse.quote(post_title)
+        #bookItem['post_title'] = post_title
         bookItem['post_author_name'] = post_author_name
         bookItem['post_term'] = post_term
         bookItem['post_description'] = post_description
 
-        for book_chapter_url in book_chapter_url_list:
-            #print(self.newdu_url+book_chapter_url)
-            yield scrapy.Request(self.newdu_url+book_chapter_url,callback=self.parse_post_content,meta={'bookItem': bookItem})
+        book_chapter_dict = dict(zip(book_chapter_name_list,book_chapter_url_list))
+        for (k,v) in book_chapter_dict.items():
+            book_chapter_name_list_index=book_chapter_name_list.index(k)+1
+            book_chapter_num = numToCharUtil._to_chinese4(book_chapter_name_list_index)
+            # 【】〖〗（）
+            bookItem['post_title'] = '【'+post_title+'】'+'〖'+k+'〗'+'（'+str(book_chapter_num)+'）'
+            yield scrapy.Request(self.newdu_url+v,callback=self.parse_post_content,meta={'bookItem': bookItem})
         pass
 
 
@@ -107,15 +113,22 @@ class NewduSpider(scrapy.Spider):
         GMT_FORMAT = '%Y-%m-%d %H:%M:%S'
         nowTime = datetime.datetime.utcnow().strftime(GMT_FORMAT)
 
-        book_chapter_name = response.xpath('//*[@id="book_middle"]/div[1]/div[2]/dl/dt/text()').extract()[0]
-        post_content_list = response.xpath('//*[@id="book_middle"]/div[1]/div[2]/dl/dd[*]/text()').extract()
-        post_content = "".join(post_content_list)
+        # book_chapter_name = response.xpath('//*[@id="book_middle"]/div[1]/div[2]/dl/dt/text()').extract()[0]
+        # post_content_list = response.xpath('//*[@id="book_middle"]/div[1]/div[2]/dl/dd[*]/text()').extract()
+        # post_content = "".join(post_content_list)
+
+        book_chapter_name = response.css(".book_middle_text dt ::text").extract()[0]
+        post_content = response.css(".book_middle_text dd").extract()[0]
+
         print(book_chapter_name)
         print(post_content)
 
+
+
+
         bookItem = response.meta['bookItem']
         #bookItem['ID'] = ID
-        bookItem['post_author'] = 6
+        bookItem['post_author'] = 1
         bookItem['post_date'] = nowTime
         bookItem['post_date_gmt'] = nowTime
         bookItem['post_content'] = post_content
@@ -125,7 +138,7 @@ class NewduSpider(scrapy.Spider):
         bookItem['comment_status'] = 'open'
         bookItem['ping_status'] = 'open'
         bookItem['post_password'] = ''
-        bookItem['post_name'] = bookItem['post_title']
+        bookItem['post_name'] = urllib.parse.quote(bookItem['post_title'])
         bookItem['to_ping'] = ''
         bookItem['pinged'] = ''
         bookItem['post_modified'] = nowTime

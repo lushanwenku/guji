@@ -22,6 +22,9 @@ class GujiPipeline:
         return s
 
     def process_item(self, item, spider):
+        if not item['post_content']:
+            return item
+
         # 分类：一级 如：经部
         cate_one_id_sql = "select a.* from wp_terms a where a.name = '{name}'".format(name=item['cate_one_name'])
         cate_one_id = self.mysql.get_one(cate_one_id_sql)[0]
@@ -46,7 +49,7 @@ class GujiPipeline:
             self.mysql.insert('wp_term_taxonomy',wp_term_taxonomy_data)
 
             #二级 导航菜单
-            nav_menu_item_two_data = {'post_author':8,'post_parent':cate_one_id}
+            nav_menu_item_two_data = {'post_author':1,'post_parent':cate_one_id}
             nav_menu_item_two_sql = "INSERT INTO wp_posts ( post_author, post_date, post_date_gmt, post_content, post_title, post_excerpt, post_status, comment_status, ping_status, post_password, post_name, to_ping, pinged, post_modified, post_modified_gmt, post_content_filtered, post_parent, guid, menu_order, post_type, post_mime_type, comment_count )VALUES({post_author},'2020-12-29 00:00:00','2020-12-29 00:00:00','','','','publish','closed','closed','','','','','2020-12-29 00:00:00','2020-12-29 00:00:00','',{post_parent},'',0,'nav_menu_item','',0)".format(**nav_menu_item_two_data)
             nav_menu_item_id = self.mysql.insert_sql(nav_menu_item_two_sql)
 
@@ -54,9 +57,7 @@ class GujiPipeline:
             wp_term_relationships_data = {'object_id':nav_menu_item_id,'term_taxonomy_id':5}
             wp_term_relationships_sql = "INSERT INTO wp_term_relationships(object_id, term_taxonomy_id, term_order) VALUES ({object_id}, {term_taxonomy_id}, 0)".format(**wp_term_relationships_data)
             wp_term_relationships_id = self.mysql.insert_sql(nav_menu_item_two_sql)
-            #
-
-        pass
+            pass
 
         cate_one_name = item['cate_one_name']
         post_term = item['post_term']
