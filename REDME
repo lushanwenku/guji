@@ -135,3 +135,33 @@ VALUES
     allowed_domains = ['newdu.com']
     start_urls = ['http://ab.newdu.com/book/']
     newdu_url = 'http://ab.newdu.com'
+
+    =======================================
+    https://so.gushiwen.org/shiwens/
+类型：诗经
+//*[@id="type1"]/div[2]/a/@href [0]
+https://so.gushiwen.org/shiwens/default.aspx?tstr=%e8%af%97%e7%bb%8f
+
+国风·周南
+关雎
+//*[@id="html"]/body/div[3]/div[1]/div[2]/div[1]/span[*]/a/@href [0]
+https://so.gushiwen.org/shiwenv_4c5705b99143.aspx
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
