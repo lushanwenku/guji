@@ -5,6 +5,8 @@
 
 
 # useful for handling different item types with a single interface
+import urllib
+
 import pypinyin
 from itemadapter import ItemAdapter
 
@@ -14,6 +16,7 @@ from guji.utils.mysql import MySQL
 class GujiPipeline:
     def __init__(self):
         self.mysql = MySQL()
+        self.wp_term_taxonomy_id = 0
 
     def hp(self,word):
         s = ''
@@ -25,20 +28,32 @@ class GujiPipeline:
         if not item['post_content']:
             return item
 
+        #print(item['cate_one_name'])
+        #print(item['post_title'])
         # 分类：一级 如：经部
         cate_one_id_sql = "select a.* from wp_terms a where a.name = '{name}'".format(name=item['cate_one_name'])
-        cate_one_id = self.mysql.get_one(cate_one_id_sql)[0]
+        cate_one_id_list = self.mysql.get_one(cate_one_id_sql)
+        cate_one_id = 0
+
+        if cate_one_id_list:
+            cate_one_id = cate_one_id_list[0]
+        else:
+            return item
 
         # 分类：二级 如：易类
         term_id = 0
         wp_terms_name = item['post_term']
+        #print(wp_terms_name)
+
         term_id_sql = "select a.* from wp_terms a where a.name = '{name}'".format(name=wp_terms_name)
         term_id_tup = self.mysql.get_one(term_id_sql)
 
         #判断二级分类是否存在
         if term_id_tup:
             term_id = term_id_tup[0]
-            print(term_id)
+            #print(term_id)
+            wp_term_taxonomy_id_sql = "select * from wp_term_taxonomy a where a.term_id = {term_id} and a.taxonomy = 'category'".format(term_id=term_id)
+            self.wp_term_taxonomy_id = self.mysql.get_one(wp_term_taxonomy_id_sql)
         else:
             wp_terms_data = {'name':wp_terms_name,'slug':self.hp(wp_terms_name),'term_group':0}
             term_id = self.mysql.insert('wp_terms',wp_terms_data)
@@ -46,7 +61,7 @@ class GujiPipeline:
             # 一级和二级 分类 添加关联
             # wp_term_taxonomy( term_id, taxonomy, description, parent, count) VALUES (17, 17, 'post_tag', '', 0, 1);
             wp_term_taxonomy_data = {'term_id':term_id,'taxonomy':'category','description':'','parent':cate_one_id,'count':0}
-            self.mysql.insert('wp_term_taxonomy',wp_term_taxonomy_data)
+            self.wp_term_taxonomy_id = self.mysql.insert('wp_term_taxonomy',wp_term_taxonomy_data)
 
             #二级 导航菜单
             nav_menu_item_two_data = {'post_author':1,'post_parent':cate_one_id}
@@ -54,9 +69,9 @@ class GujiPipeline:
             nav_menu_item_id = self.mysql.insert_sql(nav_menu_item_two_sql)
 
             #二级 导航菜单 和 菜单分类 关联
-            wp_term_relationships_data = {'object_id':nav_menu_item_id,'term_taxonomy_id':5}
+            wp_term_relationships_data = {'object_id':nav_menu_item_id,'term_taxonomy_id':self.wp_term_taxonomy_id}
             wp_term_relationships_sql = "INSERT INTO wp_term_relationships(object_id, term_taxonomy_id, term_order) VALUES ({object_id}, {term_taxonomy_id}, 0)".format(**wp_term_relationships_data)
-            wp_term_relationships_id = self.mysql.insert_sql(nav_menu_item_two_sql)
+            wp_term_relationships_id = self.mysql.insert_sql(wp_term_relationships_sql)
             pass
 
         cate_one_name = item['cate_one_name']
@@ -64,6 +79,9 @@ class GujiPipeline:
         post_description = item['post_description']
         book_chapter_name = item['book_chapter_name']
         post_author_name = item['post_author_name']
+        post_title = item['post_title']
+        item['post_title'] = post_title + '_' + book_chapter_name
+        item['post_name'] = urllib.parse.quote(post_title + '_' + book_chapter_name)
         item.pop('cate_one_name')
         item.pop('post_term')
         item.pop('post_description')
@@ -71,14 +89,16 @@ class GujiPipeline:
         item.pop('post_author_name')
         #print(item)
         wp_posts_id = self.mysql.insert('wp_posts',item)
+        item['post_title'] = post_title
         item['cate_one_name'] = cate_one_name
         item['post_term'] = post_term
         item['post_description'] = post_description
         item['book_chapter_name'] = book_chapter_name
         item['post_author_name'] = post_author_name
 
+        print(item['post_title'])
         #文章和二级分类关联
-        wp_term_relationships_data = {'object_id':wp_posts_id,'term_taxonomy_id':term_id,'term_order':0}
+        wp_term_relationships_data = {'object_id':wp_posts_id,'term_taxonomy_id':self.wp_term_taxonomy_id,'term_order':0}
         self.mysql.insert('wp_term_relationships',wp_term_relationships_data)
 
         return item

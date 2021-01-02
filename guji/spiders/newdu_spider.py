@@ -7,7 +7,10 @@ from guji.utils.num_to_char_util import NumToCharUtil
 
 class NewduSpider(scrapy.Spider):
 
-
+    name = 'newdu'
+    allowed_domains = ['newdu.com']
+    start_urls = ['http://ab.newdu.com/book/']
+    newdu_url = 'http://ab.newdu.com'
 
     # one
     # 经部：
@@ -22,15 +25,13 @@ class NewduSpider(scrapy.Spider):
         cate_one_url_list = response.xpath('//*[@id="book_right"]/div[1]/div[2]/div[*]/dl/dt/a/@href').extract()
         cate_one_dict = dict(zip(cate_one_nam_list,cate_one_url_list))
         print(cate_one_dict)
+        bookItem = GujiItem()
         for (k,v) in cate_one_dict.items():
-            bookItem = GujiItem()
-            bookItem['cate_one_name'] = k.replace("：", "")
-            yield scrapy.Request(self.newdu_url+v,callback=self.parse_next_cate_two,meta={'bookItem': bookItem})
-
-
-        for cate_one_url in cate_one_url_list:
-            #print(self.newdu_url+cate_one_url)
-            yield scrapy.Request(self.newdu_url+cate_one_url,callback=self.parse_next_cate_two)
+            cate_one_name_k = k.replace("：", "")
+            ### 判断大类
+            if cate_one_name_k == '经部':
+                bookItem['cate_one_name'] = cate_one_name_k
+                yield scrapy.Request(self.newdu_url+v,callback=self.parse_next_cate_two,meta={'bookItem': bookItem})
         pass
 
     # 经部：
@@ -52,9 +53,14 @@ class NewduSpider(scrapy.Spider):
         if bookItem['cate_one_name'].strip()=='':
             bookItem['cate_one_name'] = response.xpath('//*[@id="book_right"]/div[2]/div[1]/ul/li/text()').extract()[0]
 
-        for cate_two_url in cate_two_url_list:
-            #print(self.newdu_url+cate_two_url)
-            yield scrapy.Request(self.newdu_url+cate_two_url,callback=self.parse_next_cate_three_book_list,meta={'bookItem': bookItem})
+        cate_two_dict = dict(zip(cate_two_name_list,cate_two_url_list))
+        #print(cate_two_dict)
+        for (k,v) in cate_two_dict.items():
+            ### 判断大类
+            if k == '易类':
+                #print(self.newdu_url+v)
+                bookItem['post_term'] = k
+                yield scrapy.Request(self.newdu_url+v,callback=self.parse_next_cate_three_book_list,meta={'bookItem': bookItem})
         pass
 
     # 易类
@@ -65,16 +71,25 @@ class NewduSpider(scrapy.Spider):
         book_name_list = response.xpath('//*[@id="book_right"]/div[2]/div[2]/div[*]/div[2]/h1/a[2]/text()').extract()
         book_url_list = response.xpath('//*[@id="book_right"]/div[2]/div[2]/div[*]/div[2]/h1/a[2]/@href').extract()
         bookItem = response.meta['bookItem']
-        for book_url in book_url_list:
-            print(self.newdu_url+book_url)
-            yield scrapy.Request(self.newdu_url+book_url,callback=self.parse_next_cate_four_book_chapter_list,meta={'bookItem': bookItem})
+
+        book_dict = dict(zip(book_name_list,book_url_list))
+        #print(book_dict)
+        for (k,v) in book_dict.items():
+            # print(k)
+            # print(self.newdu_url+v)
+            ### 判断书名
+            if k == '易传':
+                bookItem['post_title'] = k
+                #print(self.newdu_url+v)
+                yield scrapy.Request(self.newdu_url+v,callback=self.parse_next_cate_four_book_chapter_list,meta={'bookItem': bookItem})
         pass
 
         # 下一页
-        next_url = response.xpath('//*[@id="dedePageList"]/dd[9]/a/@href').extract()
+        #next_url = response.xpath('//*[@id="dedePageList"]/dd[9]/a/@href').extract()
+        next_url = response.xpath('//*[@id="dedePageList"]/dd[*]/a[contains(text(), "下一页")]/@href').extract()
+        #print(self.newdu_url+'/book/'+next_url[0])
         if next_url:
-            #print(self.newdu_url+next_url)
-            yield scrapy.Request(self.newdu_url+next_url[0],callback=self.parse_next_cate_three_book_list)
+            yield scrapy.Request(self.newdu_url+'/book/'+next_url[0],callback=self.parse_next_cate_three_book_list,meta={'bookItem': bookItem})
 
 
     # 春秋左传选译
@@ -83,9 +98,9 @@ class NewduSpider(scrapy.Spider):
         # 目录3
     def parse_next_cate_four_book_chapter_list(self,response):
         numToCharUtil = NumToCharUtil()
-        post_title = response.xpath('//*[@id="book_right"]/div/div[1]/div[1]/div[2]/div/h1/text()').extract()[0]
+        #post_title = response.xpath('//*[@id="book_right"]/div/div[1]/div[1]/div[2]/div/h1/text()').extract()[0]
         post_author_name = response.xpath('//*[@id="book_right"]/div/div[1]/div[1]/div[2]/div/h2[1]/text()').extract()[0]
-        post_term = response.xpath('//*[@id="book_right"]/div/div[1]/div[1]/div[2]/div/h2[2]/a/text()').extract()[0]
+        #post_term = response.xpath('//*[@id="book_right"]/div/div[1]/div[1]/div[2]/div/h2[2]/a/text()').extract()[0]
         post_description = response.xpath('//*[@id="book_right"]/div/div[1]/div[3]/text()').extract()[0]
 
         book_chapter_name_list = response.xpath('//*[@id="chapterlist"]/dd[*]/a/text()').extract()
@@ -94,7 +109,7 @@ class NewduSpider(scrapy.Spider):
         bookItem = response.meta['bookItem']
         #bookItem['post_title'] = post_title
         bookItem['post_author_name'] = post_author_name
-        bookItem['post_term'] = post_term
+        #bookItem['post_term'] = post_term
         bookItem['post_description'] = post_description
 
         book_chapter_dict = dict(zip(book_chapter_name_list,book_chapter_url_list))
@@ -102,7 +117,10 @@ class NewduSpider(scrapy.Spider):
             book_chapter_name_list_index=book_chapter_name_list.index(k)+1
             book_chapter_num = numToCharUtil._to_chinese4(book_chapter_name_list_index)
             # 【】〖〗（）
-            bookItem['post_title'] = '【'+post_title+'】'+'〖'+k+'〗'+'（'+str(book_chapter_num)+'）'
+            #bookItem['post_title'] = '【'+post_title+'】'+'〖'+k+'〗'+'（'+str(book_chapter_num)+'）'
+            #bookItem['post_title'] = '【'+post_title+'】'+'〖'+k+'〗'
+            bookItem['book_chapter_name'] = k
+            #print(bookItem['post_title'])
             yield scrapy.Request(self.newdu_url+v,callback=self.parse_post_content,meta={'bookItem': bookItem})
         pass
 
@@ -117,14 +135,11 @@ class NewduSpider(scrapy.Spider):
         # post_content_list = response.xpath('//*[@id="book_middle"]/div[1]/div[2]/dl/dd[*]/text()').extract()
         # post_content = "".join(post_content_list)
 
-        book_chapter_name = response.css(".book_middle_text dt ::text").extract()[0]
+        #book_chapter_name = response.css(".book_middle_text dt ::text").extract()[0]
         post_content = response.css(".book_middle_text dd").extract()[0]
 
-        print(book_chapter_name)
-        print(post_content)
-
-
-
+        # print(book_chapter_name)
+        # print(post_content)
 
         bookItem = response.meta['bookItem']
         #bookItem['ID'] = ID
@@ -138,7 +153,7 @@ class NewduSpider(scrapy.Spider):
         bookItem['comment_status'] = 'open'
         bookItem['ping_status'] = 'open'
         bookItem['post_password'] = ''
-        bookItem['post_name'] = urllib.parse.quote(bookItem['post_title'])
+        #bookItem['post_name'] = urllib.parse.quote(bookItem['post_title'])
         bookItem['to_ping'] = ''
         bookItem['pinged'] = ''
         bookItem['post_modified'] = nowTime
@@ -152,8 +167,8 @@ class NewduSpider(scrapy.Spider):
         bookItem['comment_count'] = 0
         # 非数据库字段
         #bookItem['post_term'] = post_term
-        bookItem['book_chapter_name'] = book_chapter_name
-        bookItem['post_content'] = post_content
+        #bookItem['book_chapter_name'] = book_chapter_name
+        #bookItem['post_content'] = post_content
         #bookItem['post_author_name'] = post_author_name
 
         yield bookItem

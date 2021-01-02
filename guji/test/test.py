@@ -62,5 +62,11 @@ if __name__ == '__main__':
     #print(test.hp("中国"))
 
     #test.get_one()
-    test.get_html()
+    #test.get_html()
 
+    s='白话尚书 大战于甘，乃召六卿'
+    encodestr = urllib.parse.quote(s)
+    print(encodestr)
+    encodestr = '%E8%AE%BA%E8%AF%AD%E6%B3%A8%E9%87%8A_%E7%AB%8B%E8%BA%AB%E5%A4%84%E4%B8%96%E7%9A%84%E4%B8%89%E4%B8%AA%E6%94%AF%E7%82%B9'
+    uncodestr = urllib.parse.unquote(encodestr)
+    print(uncodestr)
